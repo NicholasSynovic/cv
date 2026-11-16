@@ -1,0 +1,45 @@
+name: Compile CV
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  compile:
+    name: Build LaTeX PDF
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v6
+
+      - name: Compile CV
+        uses: xu-cheng/latex-action@v4
+        with:
+          root_file: main.tex
+          args: -pdf -file-line-error -halt-on-error -interaction=nonstopmode
+
+      - name: Upload compiled PDF
+        uses: actions/upload-artifact@v7
+        with:
+          name: curriculum-vitae
+          path: main.pdf
+          if-no-files-found: error
+          retention-days: 30
+
+      - name: Upload compilation logs on failure
+        if: failure()
+        uses: actions/upload-artifact@v7
+        with:
+          name: latex-build-logs
+          path: |
+            main.log
+            main.blg
+          if-no-files-found: ignore
+          retention-days: 7
+
