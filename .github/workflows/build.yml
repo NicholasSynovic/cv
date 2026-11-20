@@ -34,7 +34,7 @@ jobs:
       - name: Rename compiled PDF
         id: rename_pdf
         run: |
-          filename="cv_$(date -u +%m-%d-%Y).pdf"
+          filename="cv.pdf"
           mv main.pdf "$filename"
           echo "filename=$filename" >> "$GITHUB_OUTPUT"
 
