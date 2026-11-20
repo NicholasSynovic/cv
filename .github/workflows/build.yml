@@ -31,11 +31,18 @@ jobs:
           root_file: main.tex
           args: -pdf -file-line-error -halt-on-error -interaction=nonstopmode
 
+      - name: Rename compiled PDF
+        id: rename_pdf
+        run: |
+          filename="cv_$(date -u +%m-%d-%Y).pdf"
+          mv main.pdf "$filename"
+          echo "filename=$filename" >> "$GITHUB_OUTPUT"
+
       - name: Upload compiled PDF
         uses: actions/upload-artifact@v7
         with:
           name: curriculum-vitae
-          path: main.pdf
+          path: ${{ steps.rename_pdf.outputs.filename }}
           if-no-files-found: error
           retention-days: 30
 
@@ -46,7 +53,7 @@ jobs:
           tag_name: ${{ github.ref_name }}
           name: ${{ github.ref_name }}
           generate_release_notes: true
-          files: main.pdf
+          files: ${{ steps.rename_pdf.outputs.filename }}
           fail_on_unmatched_files: true
 
       - name: Upload compilation logs on failure
@@ -59,4 +66,3 @@ jobs:
             main.blg
           if-no-files-found: ignore
           retention-days: 7
-
