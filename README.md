@@ -1,24 +1,35 @@
+<!-- prettier-ignore -->
+<div align="center">
+
 # Nicholas M. Synovic — Curriculum Vitae
 
-LaTeX source for my curriculum vitae (CV), with modular sections, BibLaTeX-managed publication records, and automated PDF and DOCX builds through GitHub Actions.
+_LaTeX source for my curriculum vitae (CV), with modular sections, BibLaTeX-managed publication records, and automated PDF and DOCX builds through GitHub Actions._
 
 [![License](docs/license_badge.svg)](LICENSE)
 
 [Website](https://nicholassynovic.github.io/) · [LinkedIn](https://www.linkedin.com/in/nsynovic) · [GitHub](https://github.com/NicholasSynovic)
 
-## Get the CV
+[Downloads](#downloads) • [Build Locally](#build-locally) • [Updating the CV](#updating-the-cv) • [License](#license)
 
-The [Compile CV](https://github.com/NicholasSynovic/cv/actions/workflows/build-pdf.yml) and [Compile CV DOCX](https://github.com/NicholasSynovic/cv/actions/workflows/build-docx.yml) workflows build the CV on every push, tag, and pull request, and can also be triggered manually.
+</div>
+
+## Downloads
+
+Two GitHub Actions workflows build the CV on every push, tag, and pull request, and can also be triggered manually:
+
+- [Compile CV](https://github.com/NicholasSynovic/cv/actions/workflows/build-pdf.yml) compiles `main.tex` and uploads the PDF as the `curriculum-vitae` artifact.
+- [Compile CV DOCX](https://github.com/NicholasSynovic/cv/actions/workflows/build-docx.yml) converts the source to DOCX with Pandoc and uploads it as the `curriculum-vitae-docx` artifact.
 
 To download a compiled copy:
 
-1. Open a workflow and select a successful run.
-2. Download the `curriculum-vitae` (PDF) or `curriculum-vitae-docx` (DOCX) artifact.
+1. Open the workflow and select a successful run.
+2. Download the artifact.
 3. Extract the archive to access `NicholasMSynovic_cv.pdf` or `NicholasMSynovic_cv.docx`.
 
 Artifacts are retained for 30 days.
 
-Pushing a tag also publishes both files to a [GitHub Release](https://github.com/NicholasSynovic/cv/releases).
+> [!NOTE]
+> Pushing a Git tag publishes both files to a [GitHub Release](https://github.com/NicholasSynovic/cv/releases).
 
 ## Contents
 
@@ -42,16 +53,23 @@ The CV includes sections covering:
 .
 ├── .github/
 │   └── workflows/
-│       ├── build-pdf.yml   # Automated PDF compilation and artifact uploads
-│       └── build-docx.yml  # Automated DOCX compilation and artifact uploads
-├── bibliography/           # BibLaTeX data: journals, conferences, preprints, presentations
+│       ├── build-pdf.yml    # Automated PDF compilation and artifact uploads
+│       └── build-docx.yml   # Automated DOCX compilation and artifact uploads
+├── bibliography/            # BibLaTeX data
+│   ├── conferences.bib
+│   ├── journals.bib
+│   ├── preprints.bib
+│   └── presentations.bib
+├── docs/
+│   └── license_badge.svg    # License badge referenced by this README
 ├── misc/
-│   └── typesetting.tex     # Packages, formatting, and reusable commands
+│   └── typesetting.tex      # Packages, formatting, and reusable commands
 ├── scripts/
-│   └── build_docx.py       # Pandoc-based LaTeX-to-DOCX converter
-├── sections/               # Individual CV sections
+│   └── build_docx.py        # Converts the LaTeX source to DOCX with Pandoc
+├── sections/                # Individual CV sections
 ├── LICENSE
-└── main.tex                # Document entry point and contact information
+├── main.tex                 # Document entry point and contact information
+└── README.md
 ```
 
 Content and presentation are maintained separately: `main.tex` assembles the document, `sections/` holds the CV entries, and `misc/typesetting.tex` controls the layout.
@@ -60,7 +78,7 @@ Content and presentation are maintained separately: `main.tex` assembles the doc
 
 ### Requirements
 
-For the PDF, install a LaTeX distribution with:
+Install a LaTeX distribution with:
 
 - pdfLaTeX
 - `latexmk`
@@ -70,7 +88,7 @@ For the PDF, install a LaTeX distribution with:
 
 The bibliography uses BibLaTeX with the Biber backend.
 
-For the DOCX, install Python 3 and [Pandoc](https://github.com/jgm/pandoc); the build script uses only the Python standard library.
+The DOCX build additionally requires Python 3 and [Pandoc](https://github.com/jgm/pandoc) on the `PATH` (the DOCX workflow pins Pandoc 3.14); the build script uses only the Python standard library.
 
 ### Compile
 
@@ -85,15 +103,7 @@ latexmk -pdf -file-line-error -halt-on-error -interaction=nonstopmode main.tex
 
 The compiled document is written to `main.pdf`.
 
-To build the DOCX instead:
-
-```sh
-python3 scripts/build_docx.py
-```
-
-The compiled document is written to `main.docx`.
-
-Alternatively, compile the PDF explicitly:
+Alternatively, compile explicitly:
 
 ```sh
 pdflatex -interaction=nonstopmode -halt-on-error main.tex
@@ -101,6 +111,16 @@ biber main
 pdflatex -interaction=nonstopmode -halt-on-error main.tex
 pdflatex -interaction=nonstopmode -halt-on-error main.tex
 ```
+
+### Build the DOCX
+
+From the repository root:
+
+```sh
+python3 scripts/build_docx.py
+```
+
+The script expands all `\input{...}` files, renders each bibliography `refsection` through Pandoc's citeproc, and writes `main.docx`.
 
 ### Clean Build Files
 
@@ -123,7 +143,7 @@ Contact information and profile links are defined directly in `main.tex`.
 Each publication section renders every entry of its bibliography file:
 
 ```tex
-\begin{refsection}[bibliography/journals]
+\begin{refsection}[bibliography/journals.bib]
     \nocite{*}
     \printbibliography[heading=none]
 \end{refsection}
